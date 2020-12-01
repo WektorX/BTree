@@ -10,11 +10,12 @@ class Node
     int *keys;       // tablica z kluczami (wartościami) przechowywanymi w danym wierzchołku
     Node *children;  // tablica ze wskaźnikami do dzieci danego wierzchołka
     Node *parent;    // wskaźnik do rodzica wierzchołka
+    int maxKeys;     // maksymalna ilość kluczy
 
 public:
     Node();                                      // domyślny konstruktor
-    Node(int *k, int sizeK);                     // konstruktor z przekazaną tablicą kluczy
-    Node(int howManyK, bool insertKeysManually); // konstruktor z przekazaną liczbą kluczy do wpisania ręcznie (bool == true)/wylosowania (bool == false)
+    Node(int *k, int sizeK, int maxK);           // konstruktor z przekazaną tablicą kluczy
+    Node(int howManyK, bool insertKeysManually, int maxK); // konstruktor z przekazaną liczbą kluczy do wpisania ręcznie (bool == true)/wylosowania (bool == false)
     int getKeysNumber();                         // zwraca liczbę kluczy w wierzchołku
     void setKeysNumber(int x);                   // ustawia licznik kluczy
     int getKeyValue(int pos);                    // zwraca wartość klucza z pozycji pos
@@ -23,43 +24,73 @@ public:
     void setChild(int pos, Node *n);             // ustawia wskaźnik do dziecka n na pozysji pos
     void setParent(Node *n);                     // ustawia rodzica n
     Node *getParent();                           // zwraca rodzica
+    bool full();
 };
 //konstruktor domyślny
 Node::Node() {}
 
 //konstruktor tworzący węzeł na podstawie tablicy kluczy
-Node::Node(int *k, int sizeK)
+Node::Node(int *k, int sizeK, int maxK)
 {
-
-    this->howManyKeys = sizeK;
-    this->keys = new int[sizeK];
-    for (int i = 0; i < sizeK; i++)
+    if(sizeK <= maxK)
     {
-        this->keys[i] = k[i];
+        this->howManyKeys = sizeK;
+        this->maxKeys = maxK;
+        this->keys = new int[maxK];
+        for (int i = 0; i < maxK; i++)
+        {
+            if(i < sizeK)
+            {
+                this->keys[i] = k[i];
+            }
+            else
+            {
+                this->keys[i] = -1;
+            }
+        }
+        this->children = new Node[maxK + 1] {};
+        this->parent = nullptr;
     }
-    this->children = new Node[sizeK + 1]{};
-    this->parent = nullptr;
+
 }
 //konstruuktor tworzący węzeł z ilością kluczy przekazaną i możliwością wprowadzenia wartości ręcznie lub wylosowania
-Node::Node(int howManyK, bool insertKeysManually)
+Node::Node(int howManyK, bool insertKeysManually,  int maxK)
 {
-    this->howManyKeys = howManyK;
-    this->keys = new int[howManyKeys];
-    this->children = new Node[howManyKeys + 1]{};
-    this->parent = nullptr;
-    srand(time(NULL));
-    if (insertKeysManually)
+    if(howManyK <= maxK)
     {
-        for (int i = 0; i < howManyK; i++)
+        this->maxKeys = maxK;
+        this->howManyKeys = howManyK;
+        this->keys = new int[maxK];
+        this->children = new Node[maxK + 1] {};
+        this->parent = nullptr;
+        srand(time(NULL));
+        if (insertKeysManually)
         {
-            cin >> this->keys[i];
+            for (int i = 0; i < maxK; i++)
+            {
+                if(i < howManyK)
+                {
+                    cin >> this->keys[i];
+                }
+                else
+                {
+                    this->keys[i] = -1;
+                }
+            }
         }
-    }
-    else
-    {
-        for (int i = 0; i < howManyK; i++)
+        else
         {
-            this->keys[i] = rand() % 100 + 1;
+            for (int i = 0; i < maxK; i++)
+            {
+                if(i < howManyK)
+                {
+                    this->keys[i] = rand() % 100 + 1;
+                }
+                else
+                {
+                    this->keys[i] = -1;
+                }
+            }
         }
     }
 }
@@ -130,6 +161,22 @@ void Node::setParent(Node *n)
 Node *Node::getParent()
 {
     return this->parent;
+}
+
+//sprawdza czy węzeł ma maksymalną ilość kluczy
+bool Node::full()
+{
+
+
+    for(int i=0; i<this->maxKeys; i++)
+    {
+        if( this->keys[i] == -1)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 class BTree
