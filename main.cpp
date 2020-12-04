@@ -186,7 +186,7 @@ class BTree
     Node *root;  // korzeń drzewa
 
 public:
-    BTree();                           // konstruktor tworzący puste drzewo
+    BTree(int min, int max);                           // konstruktor tworzący puste drzewo
     bool empty();                      // zwraca wartość true dla drzewa pustego, false dla niepustego
     Node *getRoot();                   // zwraca wskaźnik do korzenia
     void inorderTraversal(Node *n);    // wypisuje wartości kluczy w porządku rosnącym
@@ -202,6 +202,28 @@ public:
     int maximum();       // zwraca wartość maksymalną drzewa
     void clear();        // usuwa wszystkie wierzchołki drzewa
 };
+
+BTree::BTree(int min, int max){
+    this->minKeys = min;
+    this->maxKeys = mac;
+    this->root = nullptr;
+}
+
+
+bool BTree::empty(){
+    if(this->root == nullptr){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+Node* BTree::getRoot(){
+    return this->root;
+}
+
+
 
 int main()
 {
