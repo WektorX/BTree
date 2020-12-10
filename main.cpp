@@ -17,6 +17,7 @@ public:
     Node(int *k, int sizeK, int maxK);           // konstruktor z przekazaną tablicą kluczy
     Node(int howManyK, bool insertKeysManually, int maxK); // konstruktor z przekazaną liczbą kluczy do wpisania ręcznie (bool == true)/wylosowania (bool == false)
     int getKeysNumber();                         // zwraca liczbę kluczy w wierzchołku
+    int getMaxKeysNumber();                      // zwraca maksymalną liczbę kluczy w wierzchołku
     void setKeysNumber(int x);                   // ustawia licznik kluczy
     int getKeyValue(int pos);                    // zwraca wartość klucza z pozycji pos
     void setKeyValue(int pos, int x);            // ustawia wartość x klucza na pozycji pos
@@ -99,6 +100,11 @@ Node::Node(int howManyK, bool insertKeysManually,  int maxK)
 int Node::getKeysNumber()
 {
     return this->howManyKeys;
+}
+
+int Node::getMaxKeysNumber()
+{
+    return this->maxKeys;
 }
 
 //ustawia ilość kluczy węzła
@@ -205,7 +211,7 @@ public:
 
 BTree::BTree(int min, int max){
     this->minKeys = min;
-    this->maxKeys = mac;
+    this->maxKeys = max;
     this->root = nullptr;
 }
 
@@ -221,6 +227,45 @@ bool BTree::empty(){
 
 Node* BTree::getRoot(){
     return this->root;
+}
+
+//W bloku znajduje się 2m+1 elementów indeksu – nadmiar, przepełnienie wiec trzeba go podzielić :)
+void BTree::splitNode(Node* n) {
+    if( !n->getParent()->full() ) //założenie: rodzic węzła n nie jest pełny
+    {
+        int medianNum = (n->getMaxKeysNumber() - 1) / 2;    //wyznaczam środek liczac od 0 np. dla 2 stopnia: (5 - 1) / 2 = 2;
+
+        int* copyKeys = new int[ n->getMaxKeysNumber() ]; //tworze tablice z wartosciami od mediany w prawo ktora pomoze mi stworzyc nowy wezel
+        for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber(); i++, j++) {
+            copyKeys[j] = n->getKeyValue(i);
+            n->setKeyValue(i, -1); //ustawiam -1 na warosciach od mediany w prawo
+        }
+        Node* parent = n->getParent();
+        Node* newN = new Node(copyKeys, medianNum, n->getMaxKeysNumber()); //tworze nowy wezel na podstawie utworzonej tablicy
+        newN->setParent( parent );
+
+        for(int i = 0; i < parent->getMaxKeysNumber(); i++) {               //dodawania wartosci keys[mediana] do rodzica w odpowiednie miejsce
+            if( n->getKeyValue(medianNum) < parent->getKeyValue(i) ) {
+
+                for(int j = parent->getMaxKeysNumber(); j > i; j--) {
+                    parent->setKeyValue(j, parent->getKeyValue(j-1) );
+                }
+                parent->setKeyValue(i, n->getKeyValue(medianNum) );
+//                parent->setChild() // wstawiam nowy wezel do rodzica
+                break;
+            }
+            else if(parent->getKeyValue(i) == -1) {
+                parent->setKeyValue(i, n->getKeyValue(medianNum) );
+//                parent->setChild() // wstawiam nowy wezel do rodzica
+            }
+        }
+
+        parent->setKeysNumber( n->getParent()->getKeysNumber() + 1 );   //zwiekszam ilosc kluczy w prodzicu
+        n->setKeyValue(medianNum, -1);  //wstawiam -1 w miejsce keys[mediana]
+
+        n->setKeysNumber(medianNum);    //zmniejszam ilosc kluczy w wezle (powstawialem tam -1)
+
+    }
 }
 
 
