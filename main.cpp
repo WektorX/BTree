@@ -313,24 +313,7 @@ void BTree::mergeNodes(Node *n, Node *m){
 
 // // wstawia klucz x do drzewa
 // void BTree::insertKey(int x){
-//     if(root == NULL){
-//         root = new Node(this->getKeysNumber(), false, this->getMaxKeysNumber());
-//         root->keys[0] = x;
-//         root->howManyKeys = 1;
-//     }
 
-//     else{
-//         if(root->howManyKeys == 2*minKeys-1){
-//             Node *n = new Node(this->getKeysNumber(), false, this->getMaxKeysNumber());
-//             n->children[0] = root;
-//             n->splitNode(n);
-//             int i = 0;
-//             if(n->keys[0] < k)
-//                 i++
-//             n->children[i]->
-
-//         }
-//     }
 // }
 
 
