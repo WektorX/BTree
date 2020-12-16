@@ -6,64 +6,74 @@ using namespace std;
 
 class Node
 {
-    int howManyKeys; // licznik ile kluczy zawiera dany wierzcho³ek -> ka¿dy wierzcho³ek mo¿e posiadaæ howManyKeys + 1 dzieci
-    int maxKeys;     // maksymalna iloœæ kluczy
-    int *keys;       // tablica z kluczami (wartoœciami) przechowywanymi w danym wierzcho³ku
-    Node *children;  // tablica ze wskaŸnikami do dzieci danego wierzcho³ka
-    Node *parent;    // wskaŸnik do rodzica wierzcho³ka
+    int numberOfKeys;   // licznik ile kluczy zawiera dany wierzchołek
+    int maxKeys;        // maksymalna iliczba kluczy
+    int* keys;          // tablica z kluczami (wartościami) przechowywanymi w danym węźle
+    Node** children;     // tablica ze wskaźnikami do dzieci danego węzła
+    Node* parent;       // wskaznik do rodzica węzła
 
 public:
-    Node();                                      // domyœlny konstruktor
-    Node(int *k, int sizeK, int maxK);           // konstruktor z przekazan¹ tablic¹ kluczy
-    Node(int howManyK, bool insertKeysManually, int maxK); // konstruktor z przekazan¹ liczb¹ kluczy do wpisania rêcznie (bool == true)/wylosowania (bool == false)
-    int getKeysNumber();                         // zwraca liczbê kluczy w wierzcho³ku
-    int getMaxKeysNumber();                      // zwraca maksymaln¹ liczbê kluczy w wierzcho³ku
-    void setKeysNumber(int x);                   // ustawia licznik kluczy
-    int getKeyValue(int pos);                    // zwraca wartoœæ klucza z pozycji pos
-    void setKeyValue(int pos, int x);            // ustawia wartoœæ x klucza na pozycji pos
-    Node *getChild(int pos);                     // zwraca dziecko z pozycji pos
-    void setChild(int pos, Node *n);             // ustawia wskaŸnik do dziecka n na pozysji pos
-    void setParent(Node *n);                     // ustawia rodzica n
-    Node *getParent();                           // zwraca rodzica
-    bool full();
+    Node();                                                     // domyslny konstruktor
+    Node(int* k, int numberOfKeys, int maxKeys);                // konstruktor z przekazaniem tablicy kluczy
+    Node(int howManyK, bool insertKeysManually, int maxK);      // konstruktor z przekazaniem liczby kluczy do wpisania recznie (bool == true)/wylosowania (bool == false)
+
+    bool full();                                                // czy wezel jest pełen
+    int getKeysNumber();                                        // zwraca liczbę kluczy w wierzchołku
+    int getMaxKeysNumber();                                     // zwraca maksymalną liczbę kluczy w wierzchołku
+    int getKeyValue(int pos);                                   // zwraca wartość klucza z pozycji pos
+    Node* getChild(int pos);                                    // zwraca dziecko z pozycji pos
+    Node* getParent();                                          // zwraca rodzica
+
+    void setKeyValue(int pos, int x);                           // ustawia wartość x klucza na pozycji pos
+    void setChild(int pos, Node *n);                            // ustawia wskaźnik do dziecka n na pozysji pos
+    void setParent(Node *n);                                    // ustawia rodzica n
+    void setKeysNumber(int x);                                  // ustawia licznik kluczy
+
 };
 //konstruktor domyœlny
 Node::Node() {}
 
-//konstruktor tworz¹cy wêze³ na podstawie tablicy kluczy
-Node::Node(int *k, int sizeK, int maxK)
+//konstruktor tworzący wezel na podstawie tablicy kluczy
+Node::Node(int* k, int numberOfKeys, int maxKeys)
 {
-    if(sizeK <= maxK)
+    if(numberOfKeys <= maxKeys)
     {
-        this->howManyKeys = sizeK;
-        this->maxKeys = maxK;
-        this->keys = new int[maxK];
-        for (int i = 0; i < maxK; i++)
-        {
-            if(i < sizeK) this->keys[i] = k[i];
-            else this->keys[i] = -1;
-        }
-        this->children = new Node[maxK + 1] {};
-        this->parent = nullptr;
-    }
+        this->numberOfKeys = numberOfKeys;
+        this->maxKeys = maxKeys;
+        children = new Node* [maxKeys + 1];
 
+        keys = new int[maxKeys];
+        for (int i = 0; i < maxKeys; i++)
+        {
+            if(i < numberOfKeys) keys[i] = k[i];
+            else keys[i] = -1;
+        }
+
+        for (int i = 0; i < maxKeys + 1; i++)
+        {
+            children[i] = nullptr;
+        }
+        parent = nullptr;
+    }
 }
-//konstruuktor tworz¹cy wêze³ z iloœci¹ kluczy przekazan¹ i mo¿liwoœci¹ wprowadzenia wartoœci rêcznie lub wylosowania
-Node::Node(int howManyK, bool insertKeysManually,  int maxK)
+
+//konstruuktor tworzący węzeł z ilością kluczy przekazaną i możliwością wprowadzenia wartoœci ręcznie lub wylosowania
+Node::Node(int numberOfKeys, bool insertKeysManually,  int maxKeys)
 {
-    if(howManyK <= maxK)
+    if(numberOfKeys <= maxKeys)
     {
-        this->maxKeys = maxK;
-        this->howManyKeys = howManyK;
-        this->keys = new int[maxK];
-        this->children = new Node[maxK + 1] {};
+        this->maxKeys = maxKeys;
+        this->numberOfKeys = numberOfKeys;
+        this->keys = new int[maxKeys];
+        children = new Node* [maxKeys + 1];
         this->parent = nullptr;
+
         srand(time(NULL));
         if (insertKeysManually)
         {
-            for (int i = 0; i < maxK; i++)
+            for (int i = 0; i < maxKeys; i++)
             {
-                if(i < howManyK)
+                if(i < numberOfKeys)
                 {
                     cin >> this->keys[i];
                 }
@@ -75,9 +85,9 @@ Node::Node(int howManyK, bool insertKeysManually,  int maxK)
         }
         else
         {
-            for (int i = 0; i < maxK; i++)
+            for (int i = 0; i < maxKeys; i++)
             {
-                if(i < howManyK)
+                if(i < numberOfKeys)
                 {
                     this->keys[i] = rand() % 100 + 1;
                 }
@@ -90,183 +100,190 @@ Node::Node(int howManyK, bool insertKeysManually,  int maxK)
     }
 }
 
-//zwraca iloœæ
 int Node::getKeysNumber()
 {
-    return this->howManyKeys;
+    return numberOfKeys;
 }
 
 int Node::getMaxKeysNumber()
 {
-    return this->maxKeys;
+    return maxKeys;
 }
 
-//ustawia iloœæ kluczy wêz³a
 void Node::setKeysNumber(int x)
 {
-    this->howManyKeys = x;
+    numberOfKeys = x;
 }
 
-//zwaraca wartoœæ klucza na danej pozycji
 int Node::getKeyValue(int pos)
 {
-    if (pos >= 0 && pos < this->howManyKeys)
-    {
-        return this->keys[pos];
-    }
-    else
-    {
-        return -1;
-    }
+    if (pos >= 0 && pos < maxKeys) return keys[pos];
 }
 
-//ustawia now¹ wartoœæ wskazanego przez nas klucza
 void Node::setKeyValue(int pos, int x)
 {
-    if (pos >= 0 && pos < this->howManyKeys)
-    {
-        this->keys[pos] = x;
-        cout<<"dodaj"<<endl;
-    }
+    if (pos >= 0 && pos < maxKeys) keys[pos] = x;
 }
 
-//zwraca dziecko z podanej pozycji
-Node *Node::getChild(int pos)
+Node* Node::getChild(int pos)
 {
-    if (pos >= 0 && pos < this->howManyKeys + 1)
-    {
-        return &this->children[pos];
-    }
-    else
-    {
-        return nullptr;
-    }
+    if (pos >= 0 && pos < numberOfKeys + 1) return children[pos];
+    else return nullptr;
 }
 
-//ustawia dziecko na wskazanej pozycji
 void Node::setChild(int pos, Node *n)
 {
-    if (pos >= 0 && pos < this->howManyKeys + 1)
-    {
-        this->children[pos] = *n;
+    if (pos >= 0 && pos < maxKeys + 1) {
+        children[pos] = n;
     }
 }
 
-//ustawia ojca dla wêz³a
 void Node::setParent(Node *n)
 {
-    this->parent = n;
+    parent = n;
 }
 
-//zwraca ojca
-Node *Node::getParent()
+Node* Node::getParent()
 {
-    return this->parent;
+    return parent;
 }
 
-//sprawdza czy wêze³ ma maksymaln¹ iloœæ kluczy
 bool Node::full()
 {
-
-
-    for(int i=0; i<this->maxKeys; i++)
-    {
-        if( this->keys[i] == -1)
-        {
-            return false;
-        }
-    }
-
-    return true;
+    if(numberOfKeys == maxKeys) return true;
+    return false;
 }
 
 class BTree
 {
-    int minKeys; // minimalna liczba kluczy przechowywana w jednym wierzcho³ku
-    int maxKeys; // maksymalna liczba kluczy przechowywana w jednym wierzcho³ku
-    Node *root;  // korzeñ drzewa
+    int minKeys;     // minimalna liczba kluczy przechowywana w jednym wezle
+    int maxKeys;     // maksymalna liczba kluczy przechowywana w jednym wezle
+    int maxChildren; // maksymalna liczba dzieci
+    int minChildren; // minimalna liczba dzieci
+    Node *root;      // korzen drzewa; MINIMUM 2 DZIECI - TO ZNACZY ZE MOZE ZAWIERAC NP TYLKO 1 KLUCZ
 
 public:
-    BTree(int min, int max);           // konstruktor tworz¹cy puste drzewo
-    bool empty();                      // zwraca wartoœæ true dla drzewa pustego, false dla niepustego
-    Node *getRoot();                   // zwraca wskaŸnik do korzenia
-    void inorderTraversal(Node *n);    // wypisuje wartoœci kluczy w porz¹dku rosn¹cym
-    Node *search(int x);               // zwraca wskaŸnik do wierzcho³ka zawieraj¹cego klucz x
+    BTree(int M);                      // konstruktor tworzacy puste Btree gdzie: M MAKSYMALNA LICZBA DZIECI; M/2 MINIMALNA LICZBA DZIECI; M-1 MAKSYMALNA LICZBA KLUCZY
+
+    void insertKey(int x);             // wstawia klucz x do drzewa - mozna utworzyc nowy wezel tylko w przypadku gdy obecny jest wypelniony do polowy M/2
+    void deleteKey(int x);             // usuwa klucz x z drzewa
     void splitNode(Node *n);           // dzieli wierzcho³ek n na dwa wierzcho³ki
     void mergeNodes(Node *n, Node *m); // ³¹czy wierzcho³ki n i m o wspólnym rodzicu
-    void insertKey(int x);             // wstawia klucz x do drzewa
-    void deleteKey(int x);             // usuwa klucz x z drzewa
+    void inorderTraversal(Node *n);    // wypisuje wartoœci kluczy w porz¹dku rosn¹cym
+    int minimum();                     // zwraca wartoœæ minimaln¹ drzewa
+    int maximum();                     // zwraca wartoœæ maksymaln¹ drzewa
+    Node *search(int x);               // zwraca wskaŸnik do wierzcho³ka zawieraj¹cego klucz x
+    void clear();                      // usuwa wszystkie wierzcho³ki drzewa
 
-    int size(Node *n);   // zwraca rozmiar poddrzewa o korzeniu n
-    int height(Node *n); // zwraca wysokoœæ poddrzewa o korzeniu n
-    int minimum();       // zwraca wartoœæ minimaln¹ drzewa
-    int maximum();       // zwraca wartoœæ maksymaln¹ drzewa
-    void clear();        // usuwa wszystkie wierzcho³ki drzewa
+    Node* getRoot();                   // zwraca wskaznik do roota
+    int getSize(Node *n);              // zwraca rozmiar poddrzewa o korzeniu n
+    int getHeight(Node *n);            // zwraca wysokoœæ poddrzewa o korzeniu n
+    int getMinKeys();
+    int getMaxKeys();
+    int getMaxChildren();
+    int getMinChildren();
+    bool empty();                      // zwraca wartoœæ true dla drzewa pustego, false dla niepustego
+
+
 };
 
-BTree::BTree(int min, int max){
-    this->minKeys = min;
-    this->maxKeys = max;
-    this->root = nullptr;
+BTree::BTree(int M){
+    maxChildren = M;
+    minChildren = M / 2;
+    maxKeys = M - 1;
+    minKeys = minChildren - 1;
 }
 
-
 bool BTree::empty(){
-    if(this->root == nullptr){
-        return true;
-    }
-    else{
-        return false;
-    }
+    if(root == nullptr)return true;
+    else return false;
+}
+
+int BTree::getMaxKeys() {
+    return maxKeys;
 }
 
 Node* BTree::getRoot(){
-    return this->root;
+    return root;
 }
 
 //W bloku znajduje siê 2m+1 elementów indeksu – nadmiar, przepe³nienie wiec trzeba go podzieliæ :)
 void BTree::splitNode(Node* n) {
-    if( !n->getParent()->full() ) //za³o¿enie: rodzic wêz³a n nie jest pe³ny
-    {
-        int medianNum = (n->getMaxKeysNumber() - 1) / 2;    //wyznaczam œrodek liczac od 0 np. dla 2 stopnia: (5 - 1) / 2 = 2;
-
-        int* copyKeys = new int[ n->getMaxKeysNumber() ]; //tworze tablice z wartosciami od mediany w prawo ktora pomoze mi stworzyc nowy wezel
-        for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber(); i++, j++) {
-            copyKeys[j] = n->getKeyValue(i);
-            n->setKeyValue(i, -1); //ustawiam -1 na warosciach od mediany w prawo
-        }
-        Node* parent = n->getParent();
-        Node* newN = new Node(copyKeys, medianNum, n->getMaxKeysNumber()); //tworze nowy wezel na podstawie utworzonej tablicy
-        newN->setParent( parent );
-
-        parent->setKeysNumber( parent->getKeysNumber() + 1 );   //zwiekszam ilosc kluczy w prodzicu
-
-        for(int i = 0; i < parent->getMaxKeysNumber(); i++) {               //dodawania wartosci keys[mediana] do rodzica w odpowiednie miejsce
-            if( n->getKeyValue(medianNum) < parent->getKeyValue(i) ) {
-                //przesuwam klucze by zrobic miejsce dla mediany
-                for(int j = parent->getMaxKeysNumber() - 1; j > i; j--) parent->setKeyValue(j, parent->getKeyValue(j - 1));
-                parent->setKeyValue(i, n->getKeyValue(medianNum) );
-                break;
+    if( n->getParent() != nullptr ) {
+        if( !n->getParent()->full() ) //zalozenie ze rodzic nie moze byc pelen
+        {
+            int medianNum = (n->getMaxKeysNumber() - 1) / 2;    //wyznaczam œrodek liczac od 0 np. dla 2 stopnia: (5 - 1) / 2 = 2;
+            int* copyKeys = new int[ n->getMaxKeysNumber() ]; //tworze tablice z wartosciami od mediany w prawo ktora pomoze mi stworzyc nowy wezel
+            for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber(); i++, j++) {
+                copyKeys[j] = n->getKeyValue(i);
+                n->setKeyValue(i, -1); //ustawiam -1 na warosciach od mediany w prawo
             }
-            else if(parent->getKeyValue(i) == -1) {
-                //wstawiam klucz i nowe dzeicko na ostatnia pozycje, nie trzeba przesuwac
-                parent->setKeyValue(i, n->getKeyValue(medianNum) );
-                break;
+            Node* parent = n->getParent();
+            Node* newN = new Node(copyKeys, medianNum, n->getMaxKeysNumber()); //tworze nowy wezel na podstawie utworzonej tablicy
+
+            for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber() + 1; i++, j++) {
+                newN->setChild(j, n->getChild(i));
+                if(newN->getChild(j) != nullptr) newN->getChild(j)->setParent(newN);
+                n->setChild(i, nullptr);
             }
-        }
 
-        //szukam w tablicy dzieci wez³a n by z prawej strony wstawic tam nowo utworzony wezel
-        for(int i = 0; i < parent->getMaxKeysNumber() + 1; i++) {
-            if(parent->getChild(i)->getKeyValue(0) == n->getKeyValue(0)) {
-                //przesuwam dzieci by zrobic miejsce dla nowego dziecka
-                for(int j = parent->getMaxKeysNumber() + 1; j > i+1; j--) parent->setChild(j, parent->getChild(j-1) );
-                parent->setChild(i+1, newN); // wstawiam nowy wezel do rodzica
+            newN->setParent( parent );
+            parent->setKeysNumber( parent->getKeysNumber() + 1 );   //zwiekszam ilosc kluczy w prodzicu
+            for(int i = 0; i < parent->getKeysNumber(); i++) {
+                if(parent->getKeyValue(i) == -1) {  //wstawiam nowy klucz na koncu
+                    parent->setKeyValue(i, n->getKeyValue(medianNum) );
+                    break;
+                }
+                else if( n->getKeyValue(medianNum) < parent->getKeyValue(i) ) { // przesuwam klucze by wstawic nowy
+                    for(int j = parent->getKeysNumber() - 1; j > i; j--) parent->setKeyValue(j, parent->getKeyValue(j - 1));
+                    parent->setKeyValue(i, n->getKeyValue(medianNum) );
+                    break;
+                }
             }
+
+            //szukam w tablicy dzieci wez³a n by z prawej strony wstawic tam nowo utworzony wezel
+            for(int i = 0; i < parent->getKeysNumber() + 1; i++) {
+                if(parent->getChild(i)->getKeyValue(0) == n->getKeyValue(0)) {
+                    //przesuwam dzieci by zrobic miejsce dla nowego dziecka
+                    for(int j = parent->getKeysNumber() + 1; j > i+1; j--) parent->setChild(j, parent->getChild(j-1) );
+                    parent->setChild(i+1, newN); // wstawiam nowy wezel do rodzica
+                }
+            }
+
+            n->setKeyValue(medianNum, -1);  //wstawiam -1 w miejsce keys[mediana]
+            n->setKeysNumber(medianNum);    //zmniejszam ilosc kluczy w wezle (powstawialem tam -1)
         }
+        else {
+            splitNode( n->getParent() );
+        }
+    }
+    else {
+        if( n->getParent() == nullptr) { // pelen korzen
+            int medianNum = (n->getMaxKeysNumber() - 1) / 2;    //wyznaczam œrodek liczac od 0 np. dla 2 stopnia: (5 - 1) / 2 = 2;
+            int* copyKeys = new int[ n->getMaxKeysNumber() ]; //tworze tablice z wartosciami od mediany w prawo ktora pomoze mi stworzyc nowy wezel
+            for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber(); i++, j++) {
+                copyKeys[j] = n->getKeyValue(i);
+                n->setKeyValue(i, -1); //ustawiam -1 na warosciach od mediany w prawo
+            }
+            Node* newN = new Node(copyKeys, medianNum, n->getMaxKeysNumber()); //tworze nowy wezel na podstawie utworzonej tablicy
 
-        n->setKeyValue(medianNum, -1);  //wstawiam -1 w miejsce keys[mediana]
-        n->setKeysNumber(medianNum);    //zmniejszam ilosc kluczy w wezle (powstawialem tam -1)
+            for(int i = medianNum + 1, j = 0; i < n->getMaxKeysNumber() + 1; i++, j++) {
+                newN->setChild(j, n->getChild(i));
+                if(newN->getChild(j) != nullptr) newN->getChild(j)->setParent(newN);
+                n->setChild(i, nullptr);
+            }
 
+            int* rootKeys = new int{ n->getKeyValue(medianNum) };
+            Node* newRoot = new Node(rootKeys, 1, n->getMaxKeysNumber());
+            root = newRoot;
+            newN->setParent( root );
+            n->setParent( root );
+            n->setKeyValue(medianNum, -1);  //wstawiam -1 w miejsce keys[mediana]
+            n->setKeysNumber(medianNum);    //zmniejszam ilosc kluczy w wezle (powstawialem tam -1)
+
+            root->setChild(0, n);
+            root->setChild(1, newN);
+        }
     }
 }
 
@@ -275,100 +292,185 @@ void BTree::splitNode(Node* n) {
 
  // ³¹czy wierzcho³ki n i m o wspólnym rodzicu
 void BTree::mergeNodes(Node *n, Node *m){
-
-    if(n->getKeysNumber() + m->getKeysNumber() < n->getMaxKeysNumber() ){           // sprawdzenie czy mozemy dodac m do n
-
-        for(int i=0; i < m->getKeysNumber(); i++){                              // kopiowanie kluczy z m do n
-            n->setKeysNumber(n->getKeysNumber() + 1);
-//            cout<<n->getKeysNumber()<<endl;
-            n->setKeyValue(n->getKeysNumber() - 1, m->getKeyValue(i));
-//            cout<<n->getKeyValue(2)<<endl;
-        }
-
-        for(int i=0; i < n->getKeysNumber(); i++){
-            cout<<n->getKeyValue(i)<<endl;
-        }
-
-//        for(int i=0; i < m->getKeysNumber()+1; i++){                                // kopiowanie dzieci z m do n
-//            n->setChild(m->getKeyValue(i), n->getChild(n->getKeysNumber()+i+1));
+//
+//    if(n->getKeysNumber() + m->getKeysNumber() < n->getMaxKeysNumber() ){           // sprawdzenie czy mozemy dodac m do n
+//
+//        for(int i=0; i < m->getKeysNumber(); i++){                              // kopiowanie kluczy z m do n
+//            n->setKeysNumber(n->getKeysNumber() + 1);
+////            cout<<n->getKeysNumber()<<endl;
+//            n->setKeyValue(n->getKeysNumber() - 1, m->getKeyValue(i));
+////            cout<<n->getKeyValue(2)<<endl;
 //        }
-
-//        n->setKeysNumber(n->getKeysNumber() + m->getKeysNumber());                  // ustawienie liczby kluczy - m+n
-
-        Node* parent = n->getParent();
-
-//        for(int i=0; i < parent->getKeysNumber()+1; i++){
-//            if(parent->getChild(i)->getKeyValue(0) == m->getKeyValue(0)){           // znalezienie dziecka m
-//                for(int j=i; j < parent->getKeysNumber()+1; j++){                   // jezeli tak to
-//                    parent->setChild(j, parent->getChild(j+1));                     // usuniecie m i przesuniecie w tablicy
-//                }
-//            }
+//
+//        for(int i=0; i < n->getKeysNumber(); i++){
+//            cout<<n->getKeyValue(i)<<endl;
 //        }
+//
+////        for(int i=0; i < m->getKeysNumber()+1; i++){                                // kopiowanie dzieci z m do n
+////            n->setChild(m->getKeyValue(i), n->getChild(n->getKeysNumber()+i+1));
+////        }
+//
+////        n->setKeysNumber(n->getKeysNumber() + m->getKeysNumber());                  // ustawienie liczby kluczy - m+n
+//
+//        Node* parent = n->getParent();
+//
+////        for(int i=0; i < parent->getKeysNumber()+1; i++){
+////            if(parent->getChild(i)->getKeyValue(0) == m->getKeyValue(0)){           // znalezienie dziecka m
+////                for(int j=i; j < parent->getKeysNumber()+1; j++){                   // jezeli tak to
+////                    parent->setChild(j, parent->getChild(j+1));                     // usuniecie m i przesuniecie w tablicy
+////                }
+////            }
+////        }
+//
+//        delete m;
 
-        delete m;
-
-    }
+//    }
 }
 
 
-// // wstawia klucz x do drzewa
-// void BTree::insertKey(int x){
 
-// }
+ void BTree::insertKey(int x){
+    if( empty() ) {
+        int* arr = new int[maxKeys] {x};
+        Node* n = new Node(arr, 1, maxKeys);
+        root = n;
+    }
+    else {
+        Node* n = root;
+        bool stop = false;
+        while(!stop) {
+                int nextFlag = false;
+
+                if( n->getKeyValue( n->getKeysNumber() - 1 ) < x && n->getChild( n->getKeysNumber() ) != nullptr) {
+                    nextFlag = true;
+                    n = n->getChild( n->getKeysNumber());
+                }
+                else {
+                     for(int i = 0; i < n->getKeysNumber(); i++) {
+                        if(x < n->getKeyValue(i) && n->getChild(i) != nullptr ){
+                            nextFlag = true;
+                            n = n->getChild(i);
+                            break;
+                        }
+                    }
+                }
+                if( !nextFlag ) stop = true;
+        }
+
+        if( !n->full() ) { // dodanie klucza do wybranego węzła
+            int index;
+            for(int i = 0; i <= n->getKeysNumber(); i++) {   //znalezienie miejsca dla x w kluczach
+                if(x < n->getKeyValue(i) || n->getKeyValue(i) == -1 ){
+                    index = i;
+                    break;
+                }
+            }
+            if(index < n->getKeysNumber()) {    //przesuniecie kluczy
+                for(int i = n->getKeysNumber(); i > 0; i--) n->setKeyValue(i, n->getKeyValue(i-1));
+            }
+            n->setKeyValue(index, x);
+            n->setKeysNumber( n->getKeysNumber() + 1 );
+        }
+        else {
+            splitNode(n);
+            insertKey(x);
+        }
+    }
+ }
 
 
 
 int main()
 {
+    {
+        BTree* tree = new BTree(4);
 
-    {   //test splita
-        int tab[] {3,6};
-        Node *root = new Node( tab, 2, 3);
+        tree->insertKey(5);
+        tree->insertKey(2);
+        tree->insertKey(10);
 
-        int tab1[] {1,2};
-        Node *child1 = new Node( tab1, 2, 5);
-        child1->setParent( root );
-        root->setChild(0, child1);
-
-        int tab2[] {4,5};
-        Node *child2 = new Node( tab2, 2, 5);
-        child2->setParent( root);
-        root->setChild(1, child2);
-
-        int tab3[] {7,8};
-        Node *child3 = new Node( tab3, 2, 5);
-        child3->setParent( root);
-        root->setChild(2, child3);
-
-        cout << "root keys: ";
-        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
-        cout << endl;
-
-        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
-            cout << "child " << i << endl;
-            Node *child = root->getChild(i);
-            for(int j = 0; j < child->getMaxKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
-            cout << endl;
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getKeyValue(i) << ", ";
         }
-        cout << endl;
+        tree->insertKey(1);
+        tree->insertKey(6);
+        tree->insertKey(11);
+        tree->insertKey(9);
+        tree->insertKey(3);
+        tree->insertKey(4);
+        tree->insertKey(7);
+        tree->insertKey(8);
 
-        BTree *btree= new BTree(10, 20);
-
-        // btree->splitNode( child3 );
-        btree->mergeNodes(child1, child2);
-
-        cout << "root keys: ";
-        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
-        cout << endl;
-
-        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
-            cout << "child " << i << endl;
-            Node *child = root->getChild(i);
-            for(int j = 0; j < child->getKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
-            cout << endl;
+        cout << endl << "root: ";
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getKeyValue(i) << ", ";
         }
-        cout << endl;
+        cout << endl << "left: ";
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getChild(0)->getKeyValue(i) << ", ";
+        }
+        cout << endl << "mid: ";
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getChild(1)->getKeyValue(i) << ", ";
+        }
+        cout << endl << "r r: ";
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getChild(1)->getChild(1)->getKeyValue(i) << ", ";
+        }
+        cout << endl << "r l: ";
+        for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
+            cout << tree->getRoot()->getChild(1)->getChild(0)->getKeyValue(i) << ", ";
+        }
     }
+
+//    {   //test splita
+//        int tab[] {3,6};
+//        Node *root = new Node( tab, 2, 3);
+//
+//        int tab1[] {1,2};
+//        Node *child1 = new Node( tab1, 2, 5);
+//        child1->setParent( root );
+//        root->setChild(0, child1);
+//
+//        int tab2[] {4,5};
+//        Node *child2 = new Node( tab2, 2, 5);
+//        child2->setParent( root);
+//        root->setChild(1, child2);
+//
+//        int tab3[] {7,8};
+//        Node *child3 = new Node( tab3, 2, 5);
+//        child3->setParent( root);
+//        root->setChild(2, child3);
+//
+//        cout << "root keys: ";
+//        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
+//        cout << endl;
+//
+//        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
+//            cout << "child " << i << endl;
+//            Node *child = root->getChild(i);
+//            for(int j = 0; j < child->getMaxKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
+//            cout << endl;
+//        }
+//        cout << endl;
+//
+//        BTree *btree= new BTree(10, 20);
+//
+//        // btree->splitNode( child3 );
+//        btree->mergeNodes(child1, child2);
+//
+//        cout << "root keys: ";
+//        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
+//        cout << endl;
+//
+//        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
+//            cout << "child " << i << endl;
+//            Node *child = root->getChild(i);
+//            for(int j = 0; j < child->getKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
+//            cout << endl;
+//        }
+//        cout << endl;
+//    }
 
     return 0;
 }
