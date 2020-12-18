@@ -481,29 +481,40 @@ void BTree::deleteKey(int x)
         Node *n = this->search(x); //znajduję węzełw którym jest klucz
         if (n != this->getRoot())  //jeśli nie jest rootem
         {
-            cout << "pppppp" << endl;
             if (n->getChild(0) != nullptr) //jeśeli węzeł nie jest liście
-            {
+                {
 
-                 cout<<"lewy"<<endl;
+
                 int keyIndex = n->getKeyIndex(x);       //pobieramy index klucza który ma zostać usunięty
                 Node* leftChild= n->getChild(keyIndex) ;    //dziecko na lewo od klucza
                 Node* rightChild= n->getChild(keyIndex + 1) ;    //pobieramy dziecko na prawo od klucza
                 if(leftChild->getKeysNumber() > this->minKeys ){    //jeżeli lewy syn ma więcej kluczy niż minimum wybieramy go
-                   n->setKeyValue(keyIndex, leftChild->getKeyValue(leftChild->getKeysNumber()-1)); //pobieramy poprzednika i ustawiamy go w miejsce usuwanego kluczas
-                   leftChild->setKeyValue(leftChild->getKeysNumber()-1, leftChild->getKeyValue(leftChild->getKeysNumber()-1)-1);
+                   int temp = leftChild->getKeyValue(leftChild->getKeysNumber()-1); //pobieramy poprzednika
+                    this->deleteKey(leftChild->getKeyValue(leftChild->getKeysNumber()-1));  //usuwamy porzednika
+                    n = this->search(x);
+                    //ustawiamy nasz usuwany element na wartość poprzednika
+                    n->setKeyValue(n->getKeyIndex(x),temp);
+
+
+                 //  n->setKeyValue(keyIndex, leftChild->getKeyValue(leftChild->getKeysNumber()-1)); //pobieramy poprzednika i ustawiamy go w miejsce usuwanego kluczas
+                  // leftChild->setKeyValue(leftChild->getKeysNumber()-1, leftChild->getKeyValue(leftChild->getKeysNumber()-1)-1);
                    //w lewym synu ustawiamy wartość ostatnią na o 1 mniejszą a następnie ją usuwamy
-                   this->deleteKey(leftChild->getKeyValue(leftChild->getKeysNumber()-1));
+
 
                 }
                 else if(leftChild->getKeysNumber() <= this->minKeys  && rightChild->getKeysNumber() > this->minKeys ){
                     //jeżeli lewy syn ma mniej kluczy niż minimum wybieramy prawego syna
-                    cout<<"prawy"<<endl;
+                    //pobieramy następnika i go usuwamy
+                    int temp = rightChild->getKeyValue(0);
+                    this->deleteKey(temp);
+                    //ustawiamy na usuwanym elemencie wartośc następnika
+                    n = this->search(x);
+                    n->setKeyValue(n->getKeyIndex(x),temp);
                     //ustawiamy na miejscu usuwanego klucza następnika
-                    n->setKeyValue(keyIndex, rightChild->getKeyValue(0));
+                    //n->setKeyValue(keyIndex, rightChild->getKeyValue(0));
                     //zmniejszamy wartość pierwszego klucza w prawym synu o 1 i usuwamgy go
-                    rightChild->setKeyValue(0, rightChild->getKeyValue(0)-1);
-                    this->deleteKey(rightChild->getKeyValue(0));
+                   // rightChild->setKeyValue(0, rightChild->getKeyValue(0)-1);
+                    //this->deleteKey(rightChild->getKeyValue(0));
 
 
 
@@ -654,14 +665,18 @@ void BTree::deleteKey(int x)
             if (n->getChild(0) != nullptr) //jeśli korzeń ma dzieci
             {
                 Node *leftChild = n->getChild(keyIndex);
-                n->setKeyValue(keyIndex, leftChild->getKeyValue(leftChild->getKeysNumber() - 1)); //ustawiamy na usuwanym kluczy poprzednia
+                int temp = leftChild->getKeyValue(leftChild->getKeysNumber()-1);
+                this->deleteKey(temp);
+                n = this->search(x);
+                n->setKeyValue(n->getKeyIndex(x),temp);
+               // n->setKeyValue(keyIndex, leftChild->getKeyValue(leftChild->getKeysNumber() - 1)); //ustawiamy na usuwanym kluczy poprzednia
                                                                                                   //wartość największego klucza zawartego w poprzedzającym nasz klucz synu
 
                 //zmniejszamy wartość poprzednika o 1 a następnie wywołujemy funkcje usuwania dla niego
                 // wynika to z tego że jeśli byśmy nie zmniejszyli wartości zapętlilibbyśmy program który chciałby ushunąc jego wartość
                 //ale natrafiałby na korzeń z taką wartością i stworzyłaby się nieskończona pętla
-                leftChild->setKeyValue(leftChild->getKeysNumber() - 1, leftChild->getKeyValue(leftChild->getKeysNumber() - 1) - 1);
-                this->deleteKey(leftChild->getKeyValue(leftChild->getKeysNumber() - 1));
+               // leftChild->setKeyValue(leftChild->getKeysNumber() - 1, leftChild->getKeyValue(leftChild->getKeysNumber() - 1) - 1);
+                //this->deleteKey(leftChild->getKeyValue(leftChild->getKeysNumber() - 1));
             }
             else //jeśli korzeń nie ma dzieci usuwamy klucz i przesuwamy resztę kluczy
             {
@@ -749,13 +764,13 @@ int main()
         BTree *tree = new BTree(4);
 
 
-        for(int i=0;i<8;i++){
-            tree->insertKey(i *2);
+        for(int i=0;i<10;i++){
+            tree->insertKey(i);
         }
 
 
         tree->inorderTraversal(tree->getRoot());
-        tree->deleteKey(10);
+
         cout << endl<< "root" << endl;
         Node *k = tree->getRoot();
         for (int i = 0; i < 3; i++)
@@ -778,6 +793,7 @@ int main()
                 }
             }
         }
+
         /* tree->deleteKey(15);
 
 
