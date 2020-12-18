@@ -395,15 +395,14 @@ void BTree::mergeNodes(Node *n, Node *m)
                 }
             }*/
         }
-        cout << endl
-             << "parent" << parent->getKeysNumber() << endl
-             << parent->getKeyValue(1);
-        for (int i = parent->getKeysNumber(); i < this->maxKeys; i++)
+
+        for (int i = parent->getKeysNumber(); i <= this->maxKeys ; i++)
         {
             parent->setKeyValue(i - 1, -1);
             parent->setChild(i, nullptr);
-            parent->setKeysNumber(parent->getKeysNumber() - 1);
+
         }
+        parent->setKeysNumber(parent->getKeysNumber() - 1);
 
         // delete m;
     }
@@ -485,9 +484,42 @@ void BTree::deleteKey(int x)
             cout << "pppppp" << endl;
             if (n->getChild(0) != nullptr) //jeśeli węzeł nie jest liście
             {
+
+                 cout<<"lewy"<<endl;
+                int keyIndex = n->getKeyIndex(x);       //pobieramy index klucza który ma zostać usunięty
+                Node* leftChild= n->getChild(keyIndex) ;    //dziecko na lewo od klucza
+                Node* rightChild= n->getChild(keyIndex + 1) ;    //pobieramy dziecko na prawo od klucza
+                if(leftChild->getKeysNumber() > this->minKeys ){    //jeżeli lewy syn ma więcej kluczy niż minimum wybieramy go
+                   n->setKeyValue(keyIndex, leftChild->getKeyValue(leftChild->getKeysNumber()-1)); //pobieramy poprzednika i ustawiamy go w miejsce usuwanego kluczas
+                   leftChild->setKeyValue(leftChild->getKeysNumber()-1, leftChild->getKeyValue(leftChild->getKeysNumber()-1)-1);
+                   //w lewym synu ustawiamy wartość ostatnią na o 1 mniejszą a następnie ją usuwamy
+                   this->deleteKey(leftChild->getKeyValue(leftChild->getKeysNumber()-1));
+
+                }
+                else if(leftChild->getKeysNumber() <= this->minKeys  && rightChild->getKeysNumber() > this->minKeys ){
+                    //jeżeli lewy syn ma mniej kluczy niż minimum wybieramy prawego syna
+                    cout<<"prawy"<<endl;
+                    //ustawiamy na miejscu usuwanego klucza następnika
+                    n->setKeyValue(keyIndex, rightChild->getKeyValue(0));
+                    //zmniejszamy wartość pierwszego klucza w prawym synu o 1 i usuwamgy go
+                    rightChild->setKeyValue(0, rightChild->getKeyValue(0)-1);
+                    this->deleteKey(rightChild->getKeyValue(0));
+
+
+
+                }
+                else if(leftChild->getKeysNumber() <= this->minKeys && rightChild->getKeysNumber() <= this->minKeys){
+                    //jeżeli prawy i lewy syn mają mniej kluczy niż min
+                    //wykonujemy merge na lewym i prawy synu
+                    this->mergeNodes(leftChild,rightChild);
+                    this->deleteKey(x);
+                }
+
+
             }
             else //jeśli węzeł jest liściem
             {
+
 
                 if (n->getKeysNumber() <= this->minKeys) //jeżeli węzeł jest liściem i ma minimalną ilość kluczy
                 {
@@ -576,12 +608,12 @@ void BTree::deleteKey(int x)
                         }
                         else //będziemy robić merge z bratem z prawej
                         {
-                            cout << "pop" << endl;
+
                             for (int i = keyIndex; i < this->maxKeys; i++)
                             {
                                 if (i > n->getKeysNumber() - 1)
                                 {
-                                    cout << "i" << i;
+
                                     n->setKeyValue(i, -1);
                                 }
                                 else
@@ -616,6 +648,7 @@ void BTree::deleteKey(int x)
         }
         else if (n == this->getRoot()) //jeśli klucz jest w korzeniu
         {
+
             int keyIndex = n->getKeyIndex(x);
 
             if (n->getChild(0) != nullptr) //jeśli korzeń ma dzieci
@@ -713,39 +746,33 @@ void BTree::inorderTraversal(Node *n)
 int main()
 {
     {
-        BTree *tree = new BTree(5);
+        BTree *tree = new BTree(4);
 
-        // tree->insertKey(5);
-        // tree->insertKey(2);
-        //tree->insertKey(10);
-        // tree->insertKey(1);
-        // tree->insertKey(6);
-        // tree->insertKey(11);
-        //tree->insertKey(12);
-        // tree->insertKey(3);
-        // tree->insertKey(4);
-        // tree->insertKey(7);
-        //tree->insertKey(8);
 
-        //   cout<<endl;
+        for(int i=0;i<8;i++){
+            tree->insertKey(i *2);
+        }
+
+
         tree->inorderTraversal(tree->getRoot());
-
-        cout << endl
-             << "root" << endl;
+        tree->deleteKey(10);
+        cout << endl<< "root" << endl;
         Node *k = tree->getRoot();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             cout << k->getKeyValue(i) << ",";
         }
+        cout<<endl;
 
-        for (int i = 0; i < 5; i++)
+
+        for (int i = 0; i < 4; i++)
         {
             Node *f = tree->getRoot()->getChild(i);
             if (f != nullptr)
             {
                 cout << endl
                      << "kid " << i << endl;
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 3; j++)
                 {
                     cout << f->getKeyValue(j) << " ";
                 }
