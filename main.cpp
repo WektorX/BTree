@@ -379,7 +379,7 @@ void BTree::mergeNodes(Node *n, Node *m)
             }
         }
         n->setKeyValue(tempIndex, parent->getKeyValue(nIndex)); //wstawiamy do wezla n wartosc klucza z rodzica - graniczna wartosc pomiedzy n i m
-       //przesuwamy dzieci i klucze w rodzicu
+        //przesuwamy dzieci i klucze w rodzicu
         for (int i = nIndex; i < parent->getKeysNumber() - 1; i++)
         {
             parent->setKeyValue(i, parent->getKeyValue(i + 1));
@@ -410,7 +410,8 @@ void BTree::insertKey(int x)
         Node *n = root;
         bool stop = false;
         while (!stop)
-        {   //wyszukujemy wezla do ktorego nalezy dodac X na podstawie wartosci kluczy i wartosci X
+        {
+            //wyszukujemy wezla do ktorego nalezy dodac X na podstawie wartosci kluczy i wartosci X
             int nextFlag = false;
             if (n->getKeyValue(n->getKeysNumber() - 1) < x && n->getChild(n->getKeysNumber()) != nullptr)
             {
@@ -675,9 +676,18 @@ Node *BTree::search(int x)
         bool increment = true;
         if (x < n->getKeyValue(i))  //sprawdzamy czy wartosc x jest mniejsza od klucza na pozycji x w danym wezle
         {
-            n = n->getChild(i); //wtedy przechodzimy do wezla o indexie tym samym ktory ma klucz o wartosci wiekszej od szukanego x
-            i = 0;              //ustawiamy i na 0 bo bedziemy przesuzkiwac nowy wezel od poczatku
-            increment = false;  //nie zwiekszamy wartosci i
+            if(n->getChild(i) != nullptr)
+            {
+                n = n->getChild(i); //wtedy przechodzimy do wezla o indexie tym samym ktory ma klucz o wartosci wiekszej od szukanego x
+                i = 0;              //ustawiamy i na 0 bo bedziemy przesuzkiwac nowy wezel od poczatku
+                increment = false;  //nie zwiekszamy wartosci i
+            }
+            else
+            {
+                cout<<endl<<"Nie znaleziono klucza"<<endl;
+                return nullptr;
+            }
+
         }
         if (x == n->getKeyValue(i)) //jesli znalezlismy odpowiedni klucz zwracamy wezel w ktorym jest on zawarty
         {
@@ -686,9 +696,18 @@ Node *BTree::search(int x)
         //jezeli x wieksze od ostatiego klucza wezla oznacza to ze muslimy isc do ostatniego dziecka wezla
         if (x > n->getKeyValue(i) && i == n->getKeysNumber() - 1)
         {
-            n = n->getChild(i + 1);
-            i = 0;
-            increment = false;
+            if(n->getChild(i+1) != nullptr)
+            {
+                n = n->getChild(i + 1);
+                i = 0;
+                increment = false;
+            }
+            else
+            {
+                cout<<endl<<"Nie znaleziono klucza"<<endl;
+                return nullptr;
+            }
+
         }
         if (increment)
         {
