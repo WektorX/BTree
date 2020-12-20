@@ -1005,13 +1005,11 @@ int main()
         testTree->insertKey(170);
         testTree->inorderTraversal(testTree->getRoot());
         cout<<endl;
-        cout << endl;
-
+        //cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
         //cout << "getSize(root): 21 - " << testTree->getSize(testTree->getRoot()) << endl;
 
     	cout << "insertKey(120): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->insertKey(120); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
-        cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
-        /*cout << "getSize(root): 23 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getSize(root): 23 - " << testTree->getSize(testTree->getRoot()) << endl;
         cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
         cout << "getRoot->getKeysNumber(): 1 - " << testTree->getRoot()->getKeysNumber() << endl;
         cout << "getRoot->getKeyValue(getKeyIndex(90)): 90 - " << testTree->getRoot()->getKeyValue(testTree->getRoot()->getKeyIndex(90)) << endl;
@@ -1034,16 +1032,8 @@ int main()
 		cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
 		cout << "getSize(root): 19 - " << testTree->getSize(testTree->getRoot()) << endl;
         cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
-        cout << "getRoot->getKeysNumber(): 1 - " << testTree->getRoot()->getKeysNumber() << endl;
-        cout << "getRoot->getKeyValue(getKeyIndex(50)): 50 - " << testTree->getRoot()->getKeyValue(testTree->getRoot()->getKeyIndex(50)) << endl;
-        cout << "getRoot->getChild(0)->getKeysNumber(): 2 - " << testTree->getRoot()->getChild(0)->getKeysNumber() << endl;
-        cout << "getRoot->getChild(0)->getKeyValue(1): 60 - " << testTree->getRoot()->getChild(0)->getKeyValue(1) << endl;
 
-		////////// po usunieciu roota [90] do roota wskoczyla 50, do lewego syna roota za 50 wskoczyla 30, 60 zostala na miejscu
-        cout << "getRoot->getChild(0)->getChild(1)->getKeysNumber(): 3 - " << testTree->getRoot()->getChild(0)->getChild(1)->getKeysNumber() << endl;
-        cout << "getRoot->getChild(0)->getChild(2)->getKeysNumber(): 2 - " << testTree->getRoot()->getChild(0)->getChild(2)->getKeysNumber() << endl;
 
-        */
         /*for(int i=1; i<14; i++)
         {
             int random = rand()%50;
