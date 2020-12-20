@@ -31,7 +31,13 @@ public:
     int getKeyIndex(int x);
 };
 //konstruktor domyœlny
-Node::Node() {}
+Node::Node() {
+	this->numberOfKeys = 0;
+	this->maxKeys = 0;
+	this->keys = nullptr;
+	this->children = nullptr;
+	this->parent = nullptr;
+}
 
 //konstruktor tworzący wezel na podstawie tablicy kluczy
 Node::Node(int *k, int numberOfKeys, int maxKeys)
@@ -211,6 +217,7 @@ BTree::BTree(int M)
     minChildren = M / 2;
     maxKeys = M - 1;
     minKeys = minChildren - 1;
+    root = nullptr;
 }
 //sparwdza czy drzewo jest puste
 bool BTree::empty()
@@ -412,7 +419,7 @@ void BTree::insertKey(int x)
         while (!stop)
         {
             //wyszukujemy wezla do ktorego nalezy dodac X na podstawie wartosci kluczy i wartosci X
-            int nextFlag = false;
+            bool nextFlag = false;
             if (n->getKeyValue(n->getKeysNumber() - 1) < x && n->getChild(n->getKeysNumber()) != nullptr)
             {
                 nextFlag = true;
@@ -447,7 +454,7 @@ void BTree::insertKey(int x)
             }
             if (index < n->getKeysNumber()) //przesuniecie kluczy
             {
-                for (int i = n->getKeysNumber(); i > 0; i--)
+                for (int i = n->getKeysNumber(); i >= index; i--)
                     n->setKeyValue(i, n->getKeyValue(i - 1));
             }
             n->setKeyValue(index, x);
@@ -684,7 +691,7 @@ Node *BTree::search(int x)
             }
             else
             {
-                cout<<endl<<"Nie znaleziono klucza"<<endl;
+                cout<<"nie znaleziono klucza"<<endl;
                 return nullptr;
             }
 
@@ -704,7 +711,7 @@ Node *BTree::search(int x)
             }
             else
             {
-                cout<<endl<<"Nie znaleziono klucza"<<endl;
+                cout<<"nie znaleziono klucza"<<endl;
                 return nullptr;
             }
 
@@ -736,7 +743,6 @@ void BTree::inorderTraversal(Node *n)
         if (i != this->maxKeys && n->getKeyValue(i) != -1)
             cout << n->getKeyValue(i) << " ";
     }
-    cout<<endl;
 }
 
 //zwaraca najmniejsza wartosc w drzewie
@@ -787,7 +793,10 @@ void BTree::clear(Node* n)
 //zwraca ilosc kluczy zawartych w drzewie
 int BTree::getSize(Node *n)
 {
-
+	if(n == nullptr){
+		return 0;
+	}
+	
     if(n->getChild(0) != nullptr)
     {
         int sum = n->getKeysNumber();
@@ -796,7 +805,6 @@ int BTree::getSize(Node *n)
             sum += this->getSize(n->getChild(i));
         }
         return sum;
-
     }
     else
     {
@@ -807,7 +815,9 @@ int BTree::getSize(Node *n)
 //zwraca wysokosc poddrzewa o korzeniu n
 int BTree::getHeight(Node *n)
 {
-
+	if(n == nullptr){
+		return 0;
+	}
     if(n->getChild(0) != nullptr)
     {
         int rozmiar = 0;
@@ -835,7 +845,116 @@ int main()
         BTree *tree = new BTree(4);
 
 
-        for(int i=1; i<14; i++)
+		////// TESTING //////
+		
+		// metody klasy Node //
+		cout << "-----------------------------------------\nTesty dla danych wprowadzanych manualnie\n-----------------------------------------\n\n";
+		cout << "\t\tTesty klasy Node\n" << endl;
+		Node* testEmptyNode = new Node();
+		cout << "Domyslny konstruktor tworzacy pusty wierzcholek:" << endl;
+		cout << "full(): 1 - " << testEmptyNode->full() << endl;
+		cout << "getKeysNumber(): 0 - " << testEmptyNode->getKeysNumber() << endl;
+		cout << "getMaxKeysNumber(): 0 - " << testEmptyNode->getMaxKeysNumber() << endl;
+		delete testEmptyNode;
+		cout << "\nKonstruktor tworzacy wierzcholek na podstawie tablicy kluczy [pusta tablica kluczy, maksymalna liczba kluczy = 5]:" << endl;
+		int maxKeys = 5;
+		int* keysArray = new int[maxKeys];
+		Node* testInitializedNode = new Node(keysArray, 0, maxKeys);
+		cout << "full(): 0 - " << testInitializedNode->full() << endl;
+		cout << "getKeysNumber(): 0 - " << testInitializedNode->getKeysNumber() << endl;
+		cout << "getMaxKeysNumber(): 5 - " << testInitializedNode->getMaxKeysNumber() << endl;
+		cout << "setKeyValue(0,100): 100 - "; testInitializedNode->setKeyValue(0, 100); testInitializedNode->setKeysNumber(testInitializedNode->getKeysNumber()+1); cout << testInitializedNode->getKeyValue(0) << endl;
+		cout << "getKeyIndex(100): 0 - " << testInitializedNode->getKeyIndex(100) << endl;
+		cout << "setKeyValue(1,200): 200 - "; testInitializedNode->setKeyValue(1, 200); testInitializedNode->setKeysNumber(testInitializedNode->getKeysNumber()+1); cout << testInitializedNode->getKeyValue(1) << endl;
+		cout << "setKeyValue(2,300): 300 - "; testInitializedNode->setKeyValue(2, 300); testInitializedNode->setKeysNumber(testInitializedNode->getKeysNumber()+1); cout << testInitializedNode->getKeyValue(2) << endl;
+		cout << "setKeyValue(3,400): 400 - "; testInitializedNode->setKeyValue(3, 400); testInitializedNode->setKeysNumber(testInitializedNode->getKeysNumber()+1); cout << testInitializedNode->getKeyValue(3) << endl;
+		cout << "setKeyValue(4,500): 500 - "; testInitializedNode->setKeyValue(4, 500); testInitializedNode->setKeysNumber(testInitializedNode->getKeysNumber()+1); cout << testInitializedNode->getKeyValue(4) << endl;
+		cout << "full(): 1 - " << testInitializedNode->full() << endl;
+		cout << "Skonstruowanie nowego wierzcholka zawierajacego jeden klucz = 150, ktory bedzie dzieckiem pierwszego obiektu:" << endl;
+		keysArray[0] = 150;
+		Node* testInitializedNode2 = new Node(keysArray, 1, maxKeys);
+		cout << "setChild(1, node2), getChild(1)->getKeyIndex(150): 0 - "; testInitializedNode->setChild(1, testInitializedNode2); cout << testInitializedNode->getChild(1)->getKeyIndex(150) << endl;
+		cout << "setParent(node1), getParent()->getKeyIndex(400): 3 - "; testInitializedNode2->setParent(testInitializedNode); cout << testInitializedNode2->getParent()->getKeyIndex(400) << endl;
+        delete testInitializedNode2;
+        delete testInitializedNode;
+        delete keysArray;
+        cout << "\t\t------------------\n" << endl;
+        
+		cout << "\t\tTesty klasy BTree\n" << endl;
+        cout << "Skonstruowanie nowego pustego drzewa o maxChildren = 6, minChildren = 3, maxKeys = 5, minKeys = 2" << endl;
+        BTree* testTree = new BTree(6);
+        cout << "empty(): 1 - " << testTree->empty() << endl;
+        cout << "getSize(root): 0 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getHeight(root): 0 - " << testTree->getHeight(testTree->getRoot()) << endl;
+        cout << "getMinKeys(): 2 - " << testTree->getMinKeys() << endl;
+        cout << "getMaxKeys(): 5 - " << testTree->getMaxKeys() << endl;
+        cout << "getMinChildren(): 3 - " << testTree->getMinChildren() << endl;
+        cout << "getMaxChildren(): 6 - " << testTree->getMaxChildren() << endl;
+        cout << "insertKey(100): 100 - "; testTree->insertKey(100); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "empty(): 0 - " << testTree->empty() << endl;
+        cout << "insertKey(50): 50 100 - "; testTree->insertKey(50); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(75):  50 75 100- "; testTree->insertKey(75); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(90): 50 75 90 100 - "; testTree->insertKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(250): 50 75 90 100 250 - "; testTree->insertKey(250); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(300): 50 75 90 100 250 300 - "; testTree->insertKey(300); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "getSize(root): 6 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getHeight(root): 2 - " << testTree->getHeight(testTree->getRoot()) << endl;
+        cout << "getRoot->getKeysNumber(): 1 - " << testTree->getRoot()->getKeysNumber() << endl;
+        cout << "getRoot->getKeyValue(getKeyIndex(90)): 90 - " << testTree->getRoot()->getKeyValue(testTree->getRoot()->getKeyIndex(90)) << endl;
+        cout << "getRoot->getKeyIndex(100): -1 - " << testTree->getRoot()->getKeyIndex(100) << endl; 
+        cout << "insertKey(10): 10 50 75 90 100 250 300 - "; testTree->insertKey(10); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(20): 10 20 50 75 90 100 250 300 - "; testTree->insertKey(20); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(80): 10 20 50 75 80 90 100 250 300 - "; testTree->insertKey(80); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(150): 10 20 50 75 80 90 100 150 250 300 - "; testTree->insertKey(150); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(500): 10 20 50 75 80 90 100 150 250 300 500 - "; testTree->insertKey(500); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(95): 10 20 50 75 80 90 95 100 150 250 300 500 - "; testTree->insertKey(95); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(5): 5 10 20 50 75 80 90 95 100 150 250 300 500 - "; testTree->insertKey(5); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(15): 5 10 15 20 50 75 80 90 95 100 150 250 300 500 - "; testTree->insertKey(15); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(30): 5 10 15 20 30 50 75 80 90 95 100 150 250 300 500 - "; testTree->insertKey(30); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(60): 5 10 15 20 30 50 60 75 80 90 95 100 150 250 300 500 - "; testTree->insertKey(60); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(110): 5 10 15 20 30 50 60 75 80 90 95 100 110 150 250 300 500 - "; testTree->insertKey(110); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(180): 5 10 15 20 30 50 60 75 80 90 95 100 110 150 180 250 300 500 - "; testTree->insertKey(180); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(25): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 150 180 250 300 500 - "; testTree->insertKey(25); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(200): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 150 180 200 250 300 500 - "; testTree->insertKey(200); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(160): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 150 160 180 200 250 300 500 - "; testTree->insertKey(160); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "insertKey(170): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 150 160 170 180 200 250 300 500 - "; testTree->insertKey(170); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        //cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+		//cout << "getSize(root): 21 - " << testTree->getSize(testTree->getRoot()) << endl;	
+		cout << "insertKey(120): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->insertKey(120); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "getSize(root): 23 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
+        cout << "getRoot->getKeysNumber(): 1 - " << testTree->getRoot()->getKeysNumber() << endl;
+        cout << "getRoot->getKeyValue(getKeyIndex(90)): 90 - " << testTree->getRoot()->getKeyValue(testTree->getRoot()->getKeyIndex(90)) << endl;
+        cout << "getRoot->getKeyIndex(50): -1 - " << testTree->getRoot()->getKeyIndex(50) << endl; 
+		cout << "minimum(): 5 - " << testTree->minimum() << endl;
+		cout << "maximum(): 500 - " << testTree->maximum() << endl;
+		cout << "search(90): 90 - " << testTree->search(90)->getKeyValue(testTree->search(90)->getKeyIndex(90)) << endl;
+		cout << "search(10): 10 - " << testTree->search(10)->getKeyValue(testTree->search(10)->getKeyIndex(10)) << endl;
+		cout << "search(100): 100 - " << testTree->search(100)->getKeyValue(testTree->search(100)->getKeyIndex(100)) << endl;
+		cout << "search(300): 300 - " << testTree->search(300)->getKeyValue(testTree->search(300)->getKeyIndex(300)) << endl;
+		cout << "search(1): nie znaleziono klucza - "; testTree->search(1);
+		cout << "search(99): nie znaleziono klucza - "; testTree->search(99);
+		cout << "search(125): nie znaleziono klucza - "; testTree->search(125);
+		cout << "search(600): nie znaleziono klucza - "; testTree->search(600);
+		cout << "delete(300): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(300); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+		cout << "search(300): nie znaleziono klucza - "; testTree->search(300);
+		cout << "delete(100): 5 10 15 20 25 30 50 60 75 80 90 95 110 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(100); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+		cout << "search(100): nie znaleziono klucza - "; testTree->search(100);
+		cout << "delete(110): 5 10 15 20 25 30 50 60 75 80 90 95 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(110); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+		cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+		cout << "getSize(root): 19 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
+        cout << "getRoot->getKeysNumber(): 1 - " << testTree->getRoot()->getKeysNumber() << endl;
+        cout << "getRoot->getKeyValue(getKeyIndex(50)): 50 - " << testTree->getRoot()->getKeyValue(testTree->getRoot()->getKeyIndex(50)) << endl;
+        cout << "getRoot->getChild(0)->getKeysNumber(): 2 - " << testTree->getRoot()->getChild(0)->getKeysNumber() << endl;
+        cout << "getRoot->getChild(0)->getKeyValue(1): 60 - " << testTree->getRoot()->getChild(0)->getKeyValue(1) << endl;
+        
+		////////// po usunieciu roota [90] do roota wskoczyla 50, do lewego syna roota za 50 wskoczyla 30, 60 zostala na miejscu
+        cout << "getRoot->getChild(0)->getChild(1)->getKeysNumber(): 3 - " << testTree->getRoot()->getChild(0)->getChild(1)->getKeysNumber() << endl;
+        cout << "getRoot->getChild(0)->getChild(2)->getKeysNumber(): 2 - " << testTree->getRoot()->getChild(0)->getChild(2)->getKeysNumber() << endl;
+        
+        
+		/*for(int i=1; i<14; i++)
         {
             int random = rand()%50;
             tree->insertKey(random);
@@ -872,7 +991,7 @@ int main()
         cout<<endl<<"size :"<<tree->getSize(tree->getRoot());
         cout<<endl<<"height :"<<tree->getHeight(tree->getRoot());
         tree->clear(tree->getRoot());
-        cout<<endl<<"empty ?:"<<tree->empty();
+        cout<<endl<<"empty ?:"<<tree->empty();*/
         /* tree->deleteKey(15);
 
 
