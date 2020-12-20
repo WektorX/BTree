@@ -373,6 +373,7 @@ void BTree::mergeNodes(Node *n, Node *m)
                 nIndex = i;
             }
         }
+
         int tempIndex = n->getKeysNumber(); //index dla klucza który zostanie przeniesiony z rodzica
         n->setKeysNumber(n->getKeysNumber() + 1);
         for (int i = 0; i < m->getKeysNumber(); i++) // kopiowanie kluczy i dzieci z m do n
@@ -385,6 +386,8 @@ void BTree::mergeNodes(Node *n, Node *m)
                 n->setChild(n->getKeysNumber() - 1, m->getChild(i));
             }
         }
+
+
         n->setKeyValue(tempIndex, parent->getKeyValue(nIndex)); //wstawiamy do wezla n wartosc klucza z rodzica - graniczna wartosc pomiedzy n i m
         //przesuwamy dzieci i klucze w rodzicu
         for (int i = nIndex; i < parent->getKeysNumber() - 1; i++)
@@ -515,6 +518,7 @@ void BTree::deleteKey(int x)
             {
                 if (n->getKeysNumber() <= this->minKeys) //jeżeli węzeł jest liściem i ma minimalną ilość kluczy
                 {
+
                     int keyIndex = n->getKeyIndex(x);
                     int nodeIndex = 0;
                     for (int i = 0; i < this->maxChildren; i++) //znajdujemy index naszego wezła w tablicy rodzica
@@ -527,6 +531,7 @@ void BTree::deleteKey(int x)
                     //jeżeli nasz węzeł jest ostatnim synem ojca - nie ma następnika a poprzednik ma więcej niż minKey
                     if (nodeIndex == n->getParent()->getKeysNumber() && n->getParent()->getChild(nodeIndex - 1)->getKeysNumber() > this->minKeys)
                     {
+
                         for (int i = keyIndex; i < n->getKeysNumber() - 1; i++) //usuwamy klucz i przesuwamy wszystkie elementy w lewo
                         {
                             n->setKeyValue(i, i + 1);
@@ -552,14 +557,20 @@ void BTree::deleteKey(int x)
                     //jeżeli ma następnika który posiada więcej niż minKeys
                     else if (nodeIndex < n->getParent()->getKeysNumber() && n->getParent()->getChild(nodeIndex + 1)->getKeysNumber() > this->minKeys)
                     {
-                        for (int i = keyIndex; i < n->getKeysNumber() - 1; i++) //usuwamy klucz i przesuwamy wszystkie elementy w lewo
+                        for (int i = keyIndex; i < n->getKeysNumber(); i++) //usuwamy klucz i przesuwamy wszystkie elementy w lewo
                         {
-                            n->setKeyValue(i, i + 1);
+                            if( i > n->getKeysNumber() -1){
+                                n->setKeyValue(i,-1);
+                            }
+                            else{
+                                 n->setKeyValue(i, i + 1);
+                            }
+
                         }
                         n->setKeysNumber(n->getKeysNumber() - 1);
                         Node *rightSibling = n->getParent()->getChild(nodeIndex + 1); //pobieramy prawego brata
                         Node *parent = n->getParent();                                //pobieramy ojca
-                        int borrow = rightSibling->getKeyValue(0);                    //pobieramy następnik
+                        int borrow = rightSibling->getKeyValue(0);//pobieramy następnik
                         rightSibling->setKeysNumber(rightSibling->getKeysNumber() - 1);
                         for (int i = 0; i < rightSibling->getMaxKeysNumber(); i++) //porządkujemy klucze w tablicy i usuwamy pożyczony
                         {
@@ -569,20 +580,9 @@ void BTree::deleteKey(int x)
                                 rightSibling->setKeyValue(i, -1);
                             }
                         }
-                        rightSibling->setKeysNumber(rightSibling->getKeysNumber() - 1);
+                       // rightSibling->setKeysNumber(rightSibling->getKeysNumber() - 1);
                         int temp = parent->getKeyValue(nodeIndex);                //pobieramy klucz o indexie takim jaki ma nasz węzeł w rodzicu
-                        for (int i = nodeIndex; i < parent->getKeysNumber(); i++) //porządkujemy klucze
-                        {
-                            if (i < parent->getKeysNumber() - 1)
-                            {
-                                parent->setKeyValue(i, parent->getKeyValue(i + 1));
-                            }
-                            else
-                            {
-                                parent->setKeyValue(i, -1);
-                            }
-                        }
-                        parent->setKeyValue(parent->getKeysNumber() - 1, borrow); // ustawiamy jako ostatni klucz ten pożyczony od prawego brata
+                        parent->setKeyValue(nodeIndex, borrow); // ustawiamyna miejscu zabranego klucza od rodzica klucz z następnika
                         n->setKeyValue(n->getKeysNumber(), temp);
                         n->setKeysNumber(n->getKeysNumber() + 1);
                     }
@@ -615,6 +615,7 @@ void BTree::deleteKey(int x)
                 }
                 else // jeżeli jest liściem i ma więcej kluczy niż minimalna ilość usuwamy klucz i przesuwamy resztę kluczy
                 {
+                    cout<<endl<<"lisc z wieksza iloscia kjluczy :"<<x<<endl;
                     int index = n->getKeyIndex(x);              //pobieramy index klucza w węźle
                     for (int i = index; i < this->maxKeys; i++) //przesuwamy wszystkie większe klucze w lewo
                     {
