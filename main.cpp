@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include "bstree_avltree.hpp"
 
 using namespace std;
 
@@ -615,7 +616,7 @@ void BTree::deleteKey(int x)
                 }
                 else // jeżeli jest liściem i ma więcej kluczy niż minimalna ilość usuwamy klucz i przesuwamy resztę kluczy
                 {
-                    cout<<endl<<"lisc z wieksza iloscia kjluczy :"<<x<<endl;
+                    //cout<<endl<<"lisc z wieksza iloscia kjluczy :"<<x<<endl;
                     int index = n->getKeyIndex(x);              //pobieramy index klucza w węźle
                     for (int i = index; i < this->maxKeys; i++) //przesuwamy wszystkie większe klucze w lewo
                     {
@@ -774,7 +775,6 @@ int BTree::maximum()
 //czysci poddrzewo o korzeniu wskazanym n
 void BTree::clear(Node *n)
 {
-
     if (n->getChild(0) != nullptr)
     {
         for (int i = 0; i <= n->getKeysNumber(); i++)
@@ -1006,9 +1006,6 @@ int main()
         testTree->insertKey(170);
         testTree->inorderTraversal(testTree->getRoot());
         cout<<endl;
-        //cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
-        //cout << "getSize(root): 21 - " << testTree->getSize(testTree->getRoot()) << endl;
-
     	cout << "insertKey(120): 5 10 15 20 25 30 50 60 75 80 90 95 100 110 120 150 160 170 180 200 250 300 500 - "; testTree->insertKey(120); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
         cout << "getSize(root): 23 - " << testTree->getSize(testTree->getRoot()) << endl;
         cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
@@ -1033,144 +1030,63 @@ int main()
 		cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
 		cout << "getSize(root): 19 - " << testTree->getSize(testTree->getRoot()) << endl;
         cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
+        /*cout << "clear(): "; testTree->clear(testTree->getRoot()); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+        cout << "getSize(root): 0 - " << testTree->getSize(testTree->getRoot()) << endl;
+        cout << "getHeight(root): 0 - " << testTree->getHeight(testTree->getRoot()) << endl;*/
+        delete testTree;
+        
+        
+        ///// Porownanie podstawowych wlasciwosci BS Tree, AVL Tree i B-Tree dla tych samych danych /////
+        cout << "\n\n";
+        cout << "\t\t------------------\n"
+             << endl;
 
-
-        /*for(int i=1; i<14; i++)
-        {
-            int random = rand()%50;
-            tree->insertKey(random);
-            cout<<random<<endl;
-        }
-
-
-        tree->inorderTraversal(tree->getRoot());
-
-        cout << endl<< "root" << endl;
-        Node *k = tree->getRoot();
-        for (int i = 0; i < 3; i++)
-        {
-            cout << k->getKeyValue(i) << ",";
-        }
-        cout<<endl;
-
-
-        for (int i = 0; i < 4; i++)
-        {
-            Node *f = tree->getRoot()->getChild(i);
-            if (f != nullptr)
-            {
-                cout << endl
-                     << "kid " << i << endl;
-                for (int j = 0; j < 3; j++)
-                {
-                    cout << f->getKeyValue(j) << " ";
-                }
-            }
-        }
-        cout<<endl<<"minimum "<<tree->minimum();
-        cout<<endl<<"maximum "<<tree->maximum();
-        cout<<endl<<"size :"<<tree->getSize(tree->getRoot());
-        cout<<endl<<"height :"<<tree->getHeight(tree->getRoot());
-        tree->clear(tree->getRoot());
-        cout<<endl<<"empty ?:"<<tree->empty();*/
-        /* tree->deleteKey(15);
-
-
-
-
-         //  tree->deleteKey(6);
-         cout<<endl<<"root"<<endl;
-         Node* k = tree->getRoot();
-         for(int i=0; i<3; i++)
-         {
-             cout<<k->getKeyValue(i)<<",";
-         }
-
-           Node* km = k->getChild(0);
-
-           cout<<endl<<"lewy"<<endl;
-           for(int i=0; i<3; i++)
-           {
-               cout<<km->getKeyValue(i)<<",";
-           }
-
-           Node* kr = k->getChild(1);
-
-           cout<<endl<<"prawy"<<endl;
-           for(int i=0; i<3; i++)
-           {
-               cout<<kr->getKeyValue(i)<<",";
-           }
-         /*   cout << endl << "root: ";
-            for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
-                cout << tree->getRoot()->getKeyValue(i) << ", ";
-            }
-            cout << endl << "left: ";
-            for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
-                cout << tree->getRoot()->getChild(0)->getKeyValue(i) << ", ";
-            }
-            cout << endl << "mid: ";
-            for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
-                cout << tree->getRoot()->getChild(1)->getKeyValue(i) << ", ";
-            }
-            cout << endl << "r r: ";
-            for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
-                cout << tree->getRoot()->getChild(1)->getChild(1)->getKeyValue(i) << ", ";
-            }
-            cout << endl << "r l: ";
-            for(int i = 0; i < tree->getRoot()->getMaxKeysNumber(); i++) {
-                cout << tree->getRoot()->getChild(1)->getChild(0)->getKeyValue(i) << ", ";
-            }*/
-    }
-
-    //    {   //test splita
-    //        int tab[] {3,6};
-    //        Node *root = new Node( tab, 2, 3);
-    //
-    //        int tab1[] {1,2};
-    //        Node *child1 = new Node( tab1, 2, 5);
-    //        child1->setParent( root );
-    //        root->setChild(0, child1);
-    //
-    //        int tab2[] {4,5};
-    //        Node *child2 = new Node( tab2, 2, 5);
-    //        child2->setParent( root);
-    //        root->setChild(1, child2);
-    //
-    //        int tab3[] {7,8};
-    //        Node *child3 = new Node( tab3, 2, 5);
-    //        child3->setParent( root);
-    //        root->setChild(2, child3);
-    //
-    //        cout << "root keys: ";
-    //        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
-    //        cout << endl;
-    //
-    //        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
-    //            cout << "child " << i << endl;
-    //            Node *child = root->getChild(i);
-    //            for(int j = 0; j < child->getMaxKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
-    //            cout << endl;
-    //        }
-    //        cout << endl;
-    //
-    //        BTree *btree= new BTree(10, 20);
-    //
-    //        // btree->splitNode( child3 );
-    //        btree->mergeNodes(child1, child2);
-    //
-    //        cout << "root keys: ";
-    //        for(int i = 0; i < root->getMaxKeysNumber(); i++ ) cout << root->getKeyValue(i) << ", ";
-    //        cout << endl;
-    //
-    //        for(int i = 0; i < root->getKeysNumber() + 1; i++ ) {
-    //            cout << "child " << i << endl;
-    //            Node *child = root->getChild(i);
-    //            for(int j = 0; j < child->getKeysNumber(); j++ ) cout << child->getKeyValue(j) << ", ";
-    //            cout << endl;
-    //        }
-    //        cout << endl;
-    //    }*/
-
+        cout << "\t\tTesty porownawcze drzew: BSTree, AVL Tree, B-Tree dla tych samych danych wprowadzanych manualnie\n" << endl;
+        BSTree* bstree = new BSTree();
+        AVLTree* avltree = new AVLTree();
+        BTree* btree = new BTree(6);
+        int dane[23] = {100,50,75,90,250,300,10,20,80,150,500,95,5,15,30,60,110,180,25,200,160,170,120};
+        cout << "Dane testowe: ";
+        for(int i=0; i<23; i++){
+        	cout << dane[i] << " ";
+        	bstree->insert(dane[i]);
+        	avltree->insert(dane[i]);
+        	btree->insertKey(dane[i]);
+		}
+        
+        cout << "\n\nWysokosc drzewa BSTree: " << bstree->height(bstree->getRoot()) << endl;
+        cout << "Wysokosc drzewa AVL Tree: " << avltree->height(avltree->getRoot()) << endl;
+        cout << "Wysokosc drzewa B-Tree: " << btree->getHeight(btree->getRoot());
+        
+        delete bstree;
+        delete avltree;
+        delete btree;
+        
+        cout << "\n\n\t\tTesty porownawcze drzew: BSTree, AVL Tree, B-Tree dla tych samych losowych 100.000 danych\n" << endl;
+        
+        BSTree* random_bstree = new BSTree();
+        AVLTree* random_avltree = new AVLTree();
+        BTree* random_btree = new BTree(100);
+        
+        int x, ctr = 0;
+        
+        while(ctr<100000){
+        	x = rand() % 10000000 + 1;
+        	if(random_bstree->search(x) == nullptr){
+        		random_bstree->insert(x);
+        		random_avltree->insert(x);
+        		random_btree->insertKey(x);
+        		ctr++;
+			}
+		}
+		
+		cout << "\n\nWysokosc drzewa BSTree: " << random_bstree->height(random_bstree->getRoot()) << endl;
+        cout << "Wysokosc drzewa AVL Tree: " << random_avltree->height(random_avltree->getRoot()) << endl;
+        cout << "Wysokosc drzewa B-Tree: " << random_btree->getHeight(random_btree->getRoot());
+        
+        delete random_bstree;
+        delete random_avltree;
+        delete random_btree;
+	}
     return 0;
 }
