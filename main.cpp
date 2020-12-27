@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "bstree_avltree.hpp"
-
+#include "bstree_avltree.cpp"
 using namespace std;
 
 class Node
@@ -736,6 +736,7 @@ Node *BTree::search(int x)
 //przejście przez drzewo w porządku rosnącym
 void BTree::inorderTraversal(Node *n)
 {
+    if(n != nullptr){
     //przechodzimy po drzewie kolejno na pczatku do dziecka o indexie i wyswietamy rekurencyjnie jego dzieci i klucze
     //następnie wyświetlamy klucz i wezla i zwiekszamy i
     for (int i = 0; i < this->maxKeys + 1; i++)
@@ -749,6 +750,11 @@ void BTree::inorderTraversal(Node *n)
         if (i != this->maxKeys && n->getKeyValue(i) != -1)
             cout << n->getKeyValue(i) << " ";
     }
+}
+
+else{
+    cout<<"puste poddrzewo";
+}
 }
 
 //zwaraca najmniejsza wartosc w drzewie
@@ -777,14 +783,16 @@ void BTree::clear(Node *n)
 {
     if (n->getChild(0) != nullptr)
     {
+
         for (int i = 0; i <= n->getKeysNumber(); i++)
         {
             this->clear(n->getChild(i));
         }
-    }
-    if (n == this->getRoot())
-    {
-        this->root = nullptr;
+
+        if (n == this->getRoot())
+        {
+         this->root = nullptr;
+        }
     }
 
     delete n;
@@ -797,6 +805,8 @@ int BTree::getSize(Node *n)
     {
         return 0;
     }
+    else{
+
 
     if (n->getChild(0) != nullptr)
     {
@@ -811,6 +821,7 @@ int BTree::getSize(Node *n)
     {
         return n->getKeysNumber();
     }
+    }
 }
 //zwraca wysokosc poddrzewa o korzeniu n
 int BTree::getHeight(Node *n)
@@ -819,6 +830,7 @@ int BTree::getHeight(Node *n)
     {
         return 0;
     }
+    else{
     if (n->getChild(0) != nullptr)
     {
         int rozmiar = 0;
@@ -835,6 +847,7 @@ int BTree::getHeight(Node *n)
     {
         return 1;
     }
+}
 }
 
 int main()
@@ -1030,12 +1043,14 @@ int main()
 		cout << "delete(90): 5 10 15 20 25 30 50 60 75 80 95 120 150 160 170 180 200 250 500 - "; testTree->deleteKey(90); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
 		cout << "getSize(root): 19 - " << testTree->getSize(testTree->getRoot()) << endl;
         cout << "getHeight(root): 3 - " << testTree->getHeight(testTree->getRoot()) << endl;
-        /*cout << "clear(): "; testTree->clear(testTree->getRoot()); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
+
+
+        cout << "clear(): "; testTree->clear(testTree->getRoot()); testTree->inorderTraversal(testTree->getRoot()); cout << endl;
         cout << "getSize(root): 0 - " << testTree->getSize(testTree->getRoot()) << endl;
-        cout << "getHeight(root): 0 - " << testTree->getHeight(testTree->getRoot()) << endl;*/
+        cout << "getHeight(root): 0 - " << testTree->getHeight(testTree->getRoot()) << endl;
         delete testTree;
-        
-        
+
+
         ///// Porownanie podstawowych wlasciwosci BS Tree, AVL Tree i B-Tree dla tych samych danych /////
         cout << "\n\n";
         cout << "\t\t------------------\n"
@@ -1053,23 +1068,23 @@ int main()
         	avltree->insert(dane[i]);
         	btree->insertKey(dane[i]);
 		}
-        
+
         cout << "\n\nWysokosc drzewa BSTree: " << bstree->height(bstree->getRoot()) << endl;
         cout << "Wysokosc drzewa AVL Tree: " << avltree->height(avltree->getRoot()) << endl;
         cout << "Wysokosc drzewa B-Tree: " << btree->getHeight(btree->getRoot());
-        
+
         delete bstree;
         delete avltree;
         delete btree;
-        
+
         cout << "\n\n\t\tTesty porownawcze drzew: BSTree, AVL Tree, B-Tree dla tych samych losowych 100.000 danych\n" << endl;
-        
+
         BSTree* random_bstree = new BSTree();
         AVLTree* random_avltree = new AVLTree();
         BTree* random_btree = new BTree(100);
-        
+
         int x, ctr = 0;
-        
+
         while(ctr<100000){
         	x = rand() % 10000000 + 1;
         	if(random_bstree->search(x) == nullptr){
@@ -1079,11 +1094,11 @@ int main()
         		ctr++;
 			}
 		}
-		
+
 		cout << "\n\nWysokosc drzewa BSTree: " << random_bstree->height(random_bstree->getRoot()) << endl;
         cout << "Wysokosc drzewa AVL Tree: " << random_avltree->height(random_avltree->getRoot()) << endl;
         cout << "Wysokosc drzewa B-Tree: " << random_btree->getHeight(random_btree->getRoot());
-        
+
         delete random_bstree;
         delete random_avltree;
         delete random_btree;
